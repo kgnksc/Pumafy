@@ -1,25 +1,25 @@
 
 //Elements:
 const opacityDropdown = document.getElementById("opacity");
-const toggleCatsDropdown = document.getElementById("toggleCats");
+const togglePumaDropdown = document.getElementById("togglePuma");
 const toggleTextDropdown = document.getElementById("toggleText")
 
-opacityDropdown.onchange = SwitchCatOpacity;
-toggleCatsDropdown.onchange = ToggleCats;
+opacityDropdown.onchange = SwitchPumaOpacity;
+togglePumaDropdown.onchange = TogglePuma;
 toggleTextDropdown.onchange = ToggleText;
 
-function ToggleCats()
+function TogglePuma()
 {
     const prefs =
         {
-            toggledCats : toggleCatsDropdown.value
+            toggledPuma : togglePumaDropdown.value
         }
-    console.log(toggleCatsDropdown.value);
+    console.log(togglePumaDropdown.value);
     chrome.runtime.sendMessage({event: 'onToggleCats', prefs})
-    console.log("Sending toggleCats event");
+    console.log("Sending togglePuma event");
 }
 
-function SwitchCatOpacity()
+function SwitchPumaOpacity()
 {
     const prefs =
         {
@@ -52,14 +52,14 @@ chrome.storage.local.get(["opacity"], (result) =>
     }
 })
 
-//NOTE: Ensures that the toggle cats preferences will be saved
-chrome.storage.local.get(["toggledCats"], (result ) =>
+//NOTE: Ensures that the toggle puma preferences will be saved
+chrome.storage.local.get(["toggledPuma"], (result ) =>
 {
-    const { toggledCats } = result;
+    const { toggledPuma } = result;
 
-    if(toggledCats)
+    if(toggledPuma)
     {
-        toggleCatsDropdown.value = toggledCats;
+        togglePumaDropdown.value = toggledPuma;
     }
 })
 
