@@ -5,21 +5,14 @@
         const flipExcludedCutoff = 204; //NOTE: this number represents the cutoff for where the non flippable images start
         const flipRandomPercent = 2; //NOTE: the number represents how many numbers to randomly choose. bigger = less likely, smaller = more likely.
 
-        const schlattNames = "assets/text/schlattNames.txt";
-        const schlattNameSearchArray = ["Jschlatt", "jschlatt", "schlatt", "Schlatt", "JSCHLATT", "SCHLATT", "JSchlatt"];
-
-        let numSchlattNames = 0;
-        //let schlattNameArray = ["Jcat"];
-
         //Variables exposed to the popup:
-        let isCatsEnabled = true;
-        let isTextEnabled = false;
+        let isPumaEnabled = true;
         let opacityPercentage = 100;
 
         //NOTE: The purpose of this function is to get all YouTube thumbnails on the page
         function getThumbnails()
         {
-            if(isCatsEnabled)
+            if(isPumaEnabled)
             {
                 const thumbnailQuery = "ytd-thumbnail:not(.ytd-video-preview, .ytd-rich-grid-slim-media) a > yt-image > img.yt-core-image:only-child:not(.yt-core-attributed-string__image-element),.ytp-videowall-still-image:not([style*='extension:'])";
 
@@ -43,77 +36,36 @@
             }
         }
 
-        //NOTE: The purpose of this function is to get all Youtube titles on the page
-        function getTitles()
-        {
-            if(isTextEnabled)
-            {
-                const titles = document.querySelectorAll("#video-title-link, #video-title, #title"); //works while watching the video: '#below #title h1'
 
-                titles.forEach( (title) =>
-                {
-                    let counter = Math.random() > 0.001 ? 1 : 20;
-                    let i = 0;
-                    for(i = 0; i < counter; i++)
-                    {
-                        applyTitles(title, editTitle(title));
-                    }
-                })
-            }
-        }
-
-        chrome.storage.local.get(["opacity", "toggledCats", "toggledText"], (result) =>
+        chrome.storage.local.get(["opacity", "toggledPuma"], (result) =>
         {
             if(result.opacity)
             {
                 opacityPercentage = result.opacity;
             }
-            if(result.toggledCats !== undefined)
+            if(result.toggledPuma !== undefined)
             {
 
-                const { toggledCats } = result;
+                const { toggledPuma } = result;
 
-                if(typeof toggledCats === "string")
+                if(typeof toggledPuma === "string")
                 {
-                    switch (toggledCats)
+                    switch (toggledPuma)
                     {
                         case 'On':
                         {
-                            isCatsEnabled = true;
+                            isPumaEnabled = true;
                             break;
                         }
                         case 'Off':
                         {
-                            isCatsEnabled = false;
+                            isPumaEnabled = false;
                             break;
                         }
                     }
                 }
             }
-            if(result.toggledText)
-            {
-                const { toggledText } = result;
-
-                if(typeof toggledText === "string")
-                {
-                    switch (toggledText)
-                    {
-                        case 'On':
-                        {
-                            isTextEnabled = true;
-                            break;
-                        }
-                        case 'Off':
-                        {
-                            isTextEnabled = false;
-                            break;
-                        }
-                    }
-                }
-            }
-
             setInterval(getThumbnails, 100);
-            setInterval(getTitles, 100);
         });
 
         //Ensures that it updates whenever the user changes it
@@ -129,46 +81,26 @@
                     }
                 }
 
-                if(changes.toggledCats !== undefined)
+                if(changes.toggledPuma !== undefined)
                 {
-                    if(typeof changes.toggledCats === "string")
+                    if(typeof changes.toggledPuma === "string")
                     {
-                        switch(changes.toggledCats.newValue)
+                        switch(changes.toggledPuma.newValue)
                         {
                             case 'On':
                             {
-                                isCatsEnabled = true;
+                                isPumaEnabled = true;
                                 break;
                             }
                             case 'Off':
                             {
-                                isCatsEnabled = false;
-                                break;
-                            }
-                        }
-                    }
-                }
-                if(changes.toggledText !== undefined)
-                {
-                    if(typeof changes.toggledText === "string")
-                    {
-                        switch(changes.toggledText.newValue)
-                        {
-                            case 'On':
-                            {
-                                isTextEnabled = true;
-                                break;
-                            }
-                            case 'Off':
-                            {
-                                isTextEnabled = false;
+                                isPumaEnabled = false;
                                 break;
                             }
                         }
                     }
                 }
                 setInterval(getThumbnails, 100);
-                setInterval(getTitles, 100);
             }
         });
 
@@ -203,68 +135,6 @@
             else if (image.nodeName == "DIV")
             {
                 image.style.backgroundImage = `url("${imageUrl}"), ` + image.style.backgroundImage;
-            }
-        }
-
-        //NOTE: The purpose of this function is to apply the text to a title on YouTube.com
-        function applyTitles(title, text)
-        {
-            title.innerText = text;
-        }
-
-        //NOTE: The purpose of this function is to check a title for key words and replace them
-        function editTitle(title)
-        {
-            let text = title.innerText; //{ ...title.innerText }; //Creates a copy of the text
-            let i = 0;
-            for(i = 0; i < schlattNameSearchArray.length; i++)
-            {
-                if(text.includes(schlattNameSearchArray[i]))
-                {
-                    //foundName = true;
-
-                    //splits the string to separate out the name
-                    let splitString = text.split(schlattNameSearchArray[i]);
-
-                    text = "";
-
-                    //Reconnects the string around the replaced word
-                    let j = 0;
-                    for(j = 0; j < splitString.length; j++)
-                    {
-                        //Append the string back together with a random word from the schlatt names
-
-                        text = text.concat(splitString[j]);
-
-                        if(j !== splitString.length - 1)
-                        {
-                            let replacedName = getRandomSchlattName();
-                            let quotes = '"';
-                            replacedName = quotes + replacedName + quotes;
-                            text = text.concat((replacedName));
-                        }
-                    }
-
-                }
-            }
-
-            text.fontSize = title.fontSize;
-            return text;
-        }
-
-        //NOTE: The purpose of this function is to get a random schlatt name to replace in a video title
-        function getRandomSchlattName()
-        {
-            let random = 0;
-            random = getRandomInt(schlattList.length);
-
-            if(random <= schlattList.length)
-            {
-                return schlattList[random]; //TODO: Fill this array with names from the .txt file
-            }
-            else
-            {
-                return "Jcat";
             }
         }
 
@@ -323,128 +193,5 @@
                 return false
             })
         }
-
-        const schlattList =
-            [
-                "Bear Schlrills",
-                "Bénédictine",
-                "Bigfoot",
-                "Big Gay Man",
-                "Big Guy",
-                "big hot man hot sweaty hot big man so hot big very large hot sweaty man",
-                "Buddy Holly",
-                "Button Man",
-                "Cigarette",
-                "DEFINITELY NOT GAY",
-                "Funny Mic",
-                "Furry",
-                "Gay",
-                "Gay Slut",
-                "Homosexual M Jason Schlatum",
-                "Hot Gay Man",
-                "I only date men",
-                "Jared",
-                "Jaylor Schwift",
-                "Jebediah",
-                "J Money",
-                "Joe Biden",
-                "Jroll Face",
-                "Jschitt",
-                "Jschlit",
-                "Jschlitt",
-                "Jschlong",
-                "Jschlutt",
-                "Jschort",
-                "Jschort Simpson",
-                "Jshat",
-                "Jshit",
-                "JShlaticus",
-                "Jshmuck",
-                "Jsquirt",
-                "Jurg",
-                "Ladder Man",
-                "Logan from Big Time Rush",
-                "Ludwig",
-                "Mr. Schlog",
-                "MY FAVORITE WHITE BOY!",
-                "NutSchlack",
-                "Perry the schlatypus",
-                "REPENT OR BURN IN HELL!",
-                "Scat",
-                "Schittlestick",
-                "Schlab",
-                "Schlabberghasted",
-                "Schlagg",
-                "Schlakers",
-                "Schlalcoholic",
-                "Schlambled Eggs",
-                "Schlambles",
-                "Schlambo",
-                "Schlamboozled",
-                "Schlamega",
-                "Schlamera schlens",
-                "Schland",
-                "Schlart",
-                "Schlobama",
-                "Schlaticus",
-                "Schlatina",
-                "Schlatistics",
-                "Schlatorious",
-                "Schlatpat",
-                "Schlatsuni Miku",
-                "Schlaumatized",
-                "Schlerodichop",
-                "Schleroin Addict",
-                "Schlesticle",
-                "Schleumonoultramicroscopicsilicovolcanoconiosis",
-                "Schleven Schleleven",
-                "Schliggles",
-                "Schlim Jim",
-                "Schlitt",
-                "Schlobama",
-                "Schlock 17",
-                "Schlois",
-                "Schlomp",
-                "Schloney",
-                "Schlong",
-                "Schlonic the Hedgehog",
-                "schloofenschmirtz schlevil schilcorporated",
-                "Schlooksmaxxing",
-                "Schlop",
-                "Schloppenheimer",
-                "Schlorm",
-                "Schluatese",
-                "Schluddle",
-                "Schlugn",
-                "Schlumbfounded",
-                "Schlumpus",
-                "Schlungus",
-                "Schlunk",
-                "Schlunk Schliving",
-                "Schlunt",
-                "Schlurp",
-                "Schlurt",
-                "Schlutt the fuck up",
-                "Schmellg",
-                "Scholarship",
-                "Schquidward",
-                "Schrinkles",
-                "Schteal",
-                "Schtonks",
-                "Schumpel",
-                "Shlantidisestablishmentarianism",
-                "Slat",
-                "Smag",
-                "Squirt",
-                "The AI",
-                "The Parkour God",
-                "The PVP God",
-                "The Steel Toe",
-                "They thought I was gay",
-                "Tomska",
-                "Ultraschound",
-                "Weezer",
-                "⋮ᓭᓵ⍑ꖎᔑℸ ̣ℸ ̣"
-            ]
     }
 )();
