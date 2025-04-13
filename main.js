@@ -1,8 +1,8 @@
 (() =>
     {
         const imageFilePath = "assets/images/";
-        const numImages = 209;
-        const flipExcludedCutoff = 204; //NOTE: this number represents the cutoff for where the non flippable images start
+        const numImages = 52;
+        const flipExcludedCutoff = 39; //NOTE: this number represents the cutoff for where the non flippable images start
         const flipRandomPercent = 2; //NOTE: the number represents how many numbers to randomly choose. bigger = less likely, smaller = more likely.
 
         //Variables exposed to the popup:
